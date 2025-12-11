@@ -46,4 +46,4 @@ I hope this silly little project of mine brings you some entertainment, or perha
 
 ## License
 
-`monolog` is licensed under a [GNU General Public License](https://github.com/Antonio-Iijima/alvin/blob/main/LICENSE).
+`monolog` is licensed under a [GNU General Public License](https://github.com/Antonio-Iijima/monolog/blob/main/LICENSE).
