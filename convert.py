@@ -1,0 +1,1 @@
+open("monolog.py", "w").write(" ".join([line.strip() for line in open("dev.py", "r").readlines()[3:]]))

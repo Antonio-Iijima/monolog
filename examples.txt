@@ -1,0 +1,30 @@
+(atom (atom 'a))
+(atom '(atom 'a))
+(eq 'a 'a)
+(eq 'a 'b)
+(car '(a b c))
+(cdr '(a b c))
+(cons 'a '(b c))
+(cons 'a (cons 'b (cons 'c '())))
+(car (cons 'a '(b c)))
+(cdr (cons 'a '(b c)))
+(cond ((eq 'a 'a) 'first) ((atom '(a)) 'second))
+(cond ((eq 'a 'a) (cond ((eq 'b 'c) 'first) ('t 'second))) ('t 'third))
+(cond ((eq 'a 'b) (cond ((eq 'b 'c) 'first) ('f 'second))) ('t 'third))
+((lambda (x) (car x)) '(a b c))
+((lambda (f) (f '(b c))) '(lambda (x) (cons 'a x)))
+(cdar '((a b) (c d) e))
+(defun true (a b) a)
+(defun false (a b) b)
+(defun and (a b) (a b false))
+(and true false)
+(and (and true true) true)
+
+(defun factorial (n) 
+    (cond 
+        ((<= n 1) 1) 
+        ('t (* n (factorial (- n 1))))))
+
+(factorial 5)
+
+quit
