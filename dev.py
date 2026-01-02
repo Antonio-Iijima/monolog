@@ -7,14 +7,16 @@ from os import system, name as OS;
 (lambda PROMPT=["",""] if "-q" in argv else ["mono> ","    > "],
         COMMENT="--",
         INIT=[
-"(defun null (x) (eq x '()))",
+"(defun null? (x) (eq? x '()))",
 "(defun and (x y) (? x (? y 't '()) '()))",
 "(defun not (x) (? x '() 't))",
 "(defun or (x y) (? x 't (? y 't '())))",
+"(defun nand (x y) (not (and x y)))",
+"(defun xor (x y) (and (or x y) (nand x y)))",
 """
 (defun append (x y) 
     (cond 
-        ((null x) 
+        ((null? x) 
             y) 
         ('t 
             (cons (car x) (append (cdr x) y)))))
@@ -22,9 +24,9 @@ from os import system, name as OS;
 """
 (defun pair (x y) 
     (cond 
-        ((and (null x) (null y)) 
+        ((and (null? x) (null? y)) 
             '())
-        ((and (not (atom x)) (not (atom y))) 
+        ((and (not (atom? x)) (not (atom? y))) 
             (cons 
                 (list (car x) (car y)) 
                 (pair (cdr x) (cdr y))))))
@@ -32,24 +34,29 @@ from os import system, name as OS;
 """
 (defun assoc (x y)
     (cond
-        ((eq x (caar y)) 
+        ((eq? x (caar y)) 
             (cadar y))
         ('t (assoc x (cdr y)))))
 """,
-"(defun is (x t) (eq (type x) t))",
-"(defun islist (x) (is x (type '())))",
-"(defun isint (x) (is x (type 0)))",
-"(defun isfloat (x) (is x (type 0.0)))",
-"(defun isstr (x) (is x (type '_)))",
-"(defun map (f l) (cond ((null l) '()) ('t (cons (f (car l)) (map f (cdr l))))))"
+"(defun is (x t) (eq? (type x) t))",
+"(defun list? (x) (is x (type '())))",
+"(defun int? (x) (is x (type 0)))",
+"(defun float? (x) (is x (type 0.0)))",
+"(defun str? (x) (is x (type '_)))",
+"(defun map (f l) (cond ((null l) '()) ('t (cons (f (car l)) (map f (cdr l))))))",
+"(defun == (x y) (eq? x y))",
+"(defun >= (x y) (or (> x y) (== x y)))",
+"(defun <= (x y) (or (< x y) (== x y)))"
 ],
         BUILTINS=[
             "c[*]r",
-            "quote", "atom", "eq", "cons", "cond",
+            "quote", "atom?", "eq?", "cons", "cond",
             "?",
             "list",
-            "+", "-", "*", "/", "%",
-            ">", ">=", "<", "<=", "==",
+            "+", "-", 
+            "*", "/", "//",
+            "**", "%",
+            ">", "<",
             "defun", 
             "type"
         ],
@@ -83,8 +90,8 @@ from os import system, name as OS;
                                         [retype(expr[0]), *preprocess(preprocess, expr[1:])] for retype in [
                                             lambda expr:         
                                                 (
-                                                    int(expr) if expr.isdecimal()
-                                                    else float(expr) if "." in expr and expr.replace(".", "", 1).isnumeric()
+                                                    int(expr) if expr.removeprefix("-").isdecimal()
+                                                    else float(expr) if "." in expr and expr.removeprefix("-").replace(".", "", 1).isnumeric()
                                                     else expr
                                                 ) if isinstance(expr, str)
                                                 else expr
@@ -99,8 +106,8 @@ from os import system, name as OS;
                     (
                         expr if isinstance(expr, (int, float))
                         else (
-                            int(expr) if expr.isdecimal()
-                            else float(expr) if "." in expr and expr.replace(".", "", 1).isnumeric()
+                            int(expr) if expr.removeprefix("-").isdecimal()
+                            else float(expr) if "." in expr and expr.removeprefix("-").replace(".", "", 1).isnumeric()
                             else get(ENV, expr)
                         ) if isinstance(expr, str)
                         else expr
@@ -123,10 +130,10 @@ from os import system, name as OS;
                                 for operators in [
                                             {
                                                 "quote" : lambda x: x,
-                                                "atom" : lambda x: not isinstance(x, list),
-                                                "eq" : lambda x, y: x == y,
-                                                "cons" : lambda x, y: [x] + y,
-                                                "cond" : lambda *expr: [
+                                                "atom?" : lambda x: not isinstance(x, list),
+                                                "eq?"   : lambda x, y: x == y,
+                                                "cons"  : lambda x, y: [x] + y,
+                                                "cond"  : lambda *expr: [
                                                         evcond(evcond, list(expr)) for evcond in [
                                                         lambda evcond, expr: 
                                                             EVAL(EVAL, ENV, expr[0][1]) if EVAL(EVAL, ENV, expr[0][0]) 
@@ -138,17 +145,16 @@ from os import system, name as OS;
 
                                                 "list" : lambda *elems: list(elems),
 
-                                                "+" : lambda x, y: x + y,
-                                                "-" : lambda x, y: x - y,
-                                                "*" : lambda x, y: x * y,
-                                                "/" : lambda x, y: x / y,
-                                                "%" : lambda x, y: x % y,
+                                                "+"  : lambda x, y: x + y,
+                                                "-"  : lambda x, y: x - y,
+                                                "*"  : lambda x, y: x * y,
+                                                "/"  : lambda x, y: x / y,
+                                                "//" : lambda x, y: x // y,
+                                                "**" : lambda x, y: x ** y,
+                                                "%"  : lambda x, y: x % y,
                                                 
                                                 ">" : lambda x, y: x > y,
-                                                ">=" : lambda x, y: x >= y,
                                                 "<" : lambda x, y: x < y,
-                                                "<=" : lambda x, y: x <= y,
-                                                "==" : lambda x, y: x == y,
                                                 
                                                 "defun" : lambda fname, params, body: ENV.insert(0, (fname, ["label", fname, ["lambda", params, body]])),
 

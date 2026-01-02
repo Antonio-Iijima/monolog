@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+path="$(dirname "$BASH_SOURCE")"
+
+case $1 in
+    "--help") echo "monolog:
+    --help  : if this needs explanation, how did you get here?
+    --build : reduce dev.py to monolog.py
+    -i      : run the monolog interpreter
+    -q      : silence the interpreter prompt
+    -d      : run the developer version (dev.py)"
+    ;;
+    "--build") python3 $path/convert.py $path/dev.py $path/monolog.py
+    ;;
+    "--dev") shift; python3 $path/dev.py $@
+    ;;
+    *) python3 $path/monolog.py $@
+    ;;
+esac

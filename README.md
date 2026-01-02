@@ -25,7 +25,9 @@ There are multiple ways such a program could be implemented; `monolog` provides 
 
 The intrigued programmer will observe on perusing the source code that the final product, while it fulfills the first requirement, seemingly ignores the other two. This, however, is somewhat cosmetic: the two imported modules (`sys` and `os`) provide quality of life features like prompt silencing and a terminal `clear` command; they are intentionally *not* used in the main logic of the program itself, and can be excised with minimal complications.
 
-Other than this minor qualification, `monolog` is quite successful, surpassing its initial goals. It implements everything mentioned in Graham's essay, from arbitrary `cxr`-form operators to function definition. It even includes arithmetic operations, a ternary operator `?`, metakeywords `dev.env` and `dev.kw`, and a bunch of built-in functions defined at runtime.
+Other than this minor qualification, `monolog` is quite successful, surpassing its initial goals. It implements everything mentioned in Graham's essay, from arbitrary `c[ad]+r`-form operators to function definition. It even includes arithmetic operations, a ternary operator `?`, metakeywords `dev.env` and `dev.kw`. 
+
+`monolog` attempts to remain faithful to the spirit of simplicity demonstrated by the paper, and implements as little as possible in Python: if a built-in function could be written in `monolog` using more basic primitives, then so it would be - although I did draw the line at writing `*` and `**` recursively in terms of `+`. But in general, most basic functions other than `quote`, `atom?`, `eq?`, `cons`, and `cond` (and assorted math operators) are defined at runtime as `monolog` functions.
 
 ## Nota Bene
 
@@ -33,12 +35,13 @@ Other than this minor qualification, `monolog` is quite successful, surpassing i
 
 The provided files include:
 
+- `mono` - a Bash script for running the project (e.g. `$ mono -i`)
 - `monolog.py` - the single line of code itself.
 - `dev.py` - the 'developer' version of the program, since writing the whole thing on one line would be a nightmare.
 - `convert.py` - a (coincidentally) single line implementation of a multiline to single line converter, specifically designed for the **current implementation** of `dev.py`. Particularly, be careful when changing the number of lines to ignore at the beginning of `dev.py` to avoid breaking the one-line version.
-- `examples.txt` and `interpreter.txt` - just some sample code; the interpreter is copied verbatim from *TRoL* (a truly lamentable abbreviation).
+- `examples.txt` and `interpreter.txt` - just some sample code; the interpreter is copied almost verbatim from *TRoL* (a truly lamentable abbreviation).
 
-Files may be directed to the interpreter through standard input: `python3 monolog.py -q < interpreter.py`. I **highly recommend** using the `-q` flag when reading file input to silence the interpreter prompt.
+Files may be directed to the interpreter through standard input: `$ python3 monolog.py -q < interpreter.py` or `$ mono -q < interpreter.py`. I **highly recommend** using the `-q` flag when reading file input to silence the interpreter prompt.
 
 `quit` must be placed at the end of any input files to prevent an `EOFError`; to my knowledge there is no way to catch this within the constraints, but I would welcome suggestions.
 

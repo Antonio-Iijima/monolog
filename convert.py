@@ -1,1 +1,1 @@
-open("monolog.py", "w").write(" ".join([line.strip() for line in open("dev.py", "r").readlines()[3:]]))
+from sys import argv; open(argv[2], "w").write(" ".join([line.strip() for line in open(argv[1], "r").readlines()[3:]]))
